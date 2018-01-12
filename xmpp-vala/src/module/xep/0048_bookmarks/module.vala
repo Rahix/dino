@@ -1,7 +1,5 @@
 using Gee;
 
-using Xmpp.Core;
-
 namespace Xmpp.Xep.Bookmarks {
 private const string NS_URI = "storage:bookmarks";
 
@@ -10,12 +8,16 @@ public class Module : XmppStreamModule {
 
     public signal void received_conferences(XmppStream stream, Gee.List<Conference> conferences);
 
-    public delegate void OnResult(XmppStream stream, Gee.List<Conference> conferences);
+    public delegate void OnResult(XmppStream stream, Gee.List<Conference>? conferences);
     public void get_conferences(XmppStream stream, owned OnResult listener) {
         StanzaNode get_node = new StanzaNode.build("storage", NS_URI).add_self_xmlns();
         stream.get_module(PrivateXmlStorage.Module.IDENTITY).retrieve(stream, get_node, (stream, node) => {
-            Gee.List<Conference> conferences = get_conferences_from_stanza(node);
-            listener(stream, conferences);
+            if (node == null) {
+                listener(stream, null);
+            } else {
+                Gee.List<Conference> conferences = get_conferences_from_stanza(node);
+                listener(stream, conferences);
+            }
         });
     }
 
