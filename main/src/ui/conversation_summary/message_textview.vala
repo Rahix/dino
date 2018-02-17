@@ -93,7 +93,7 @@ public class MessageTextView : TextView {
             if (url != null) {
                 Gtk.MenuItem copy_url_item = new Gtk.MenuItem.with_label(_("Copy Link Address")) { visible=true };
                 copy_url_item.activate.connect(() => {
-                    Clipboard.get_default(window.get_display()).set_text(url, url.length);
+                    Clipboard.get_for_display(window.get_display(), Gdk.SELECTION_CLIPBOARD).set_text(url, url.length);
                 });
                 popup.append(copy_url_item);
             }
