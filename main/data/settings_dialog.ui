@@ -66,13 +66,40 @@
                             </packing>
                         </child>
                         <child>
+                            <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                    <object class="GtkCheckButton" id="custom_sound_checkbutton">
+                                        <property name="label" translatable="yes">Use a custom sound</property>
+                                        <property name="visible">True</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkFileChooserButton" id="custom_sound_file">
+                                        <property name="title" translatable="yes">Select a custom custom sound</property>
+                                        <property name="visible">True</property>
+                                    </object>
+                                    <packing>
+                                        <property name="pack_type">end</property>
+                                    </packing>
+                                </child>
+                            </object>
+                            <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">4</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                            </packing>
+                        </child>
+                        <child>
                             <object class="GtkCheckButton" id="emoji_checkbutton">
                                 <property name="label" translatable="yes">Convert smileys to emojis</property>
                                 <property name="visible">True</property>
                             </object>
                             <packing>
                                 <property name="left_attach">0</property>
-                                <property name="top_attach">4</property>
+                                <property name="top_attach">5</property>
                                 <property name="width">1</property>
                                 <property name="height">1</property>
                             </packing>
