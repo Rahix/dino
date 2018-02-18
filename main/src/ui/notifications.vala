@@ -73,8 +73,7 @@ public class Notifications : Object {
         }
         if (conversation.get_sound_setting(stream_interactor)) {
             sound_context.play (0,
-                Canberra.PROP_EVENT_ID, "message-new-instant",
-                Canberra.PROP_EVENT_DESCRIPTION, "New Dino message");
+                Canberra.PROP_MEDIA_FILENAME, "sound.ogg");
         }
     }
 
