@@ -11,6 +11,8 @@ public class Settings : Object {
         send_marker_ = col_to_bool_or_default("send_marker", true);
         notifications_ = col_to_bool_or_default("notifications", true);
         sound_ = col_to_bool_or_default("sound", true);
+        custom_sound_ = col_to_bool_or_default("custom_sound", false);
+        custom_sound_file_ = col_to_string_or_default("custom_sound_file", "");
         convert_utf8_smileys_ = col_to_bool_or_default("convert_utf8_smileys", true);
 
         current_width = col_to_int_or_default("window_width", 1200);
@@ -28,6 +30,11 @@ public class Settings : Object {
     private int col_to_int_or_default(string key, int def) {
         string? val = db.settings.select({db.settings.value}).with(db.settings.key, "=", key)[db.settings.value];
         return val != null ? int.parse(val) : def;
+    }
+
+    private string col_to_string_or_default(string key, string def) {
+        string? val = db.settings.select({db.settings.value}).with(db.settings.key, "=", key)[db.settings.value];
+        return val != null ? val : def;
     }
 
     private bool send_typing_;
@@ -63,6 +70,24 @@ public class Settings : Object {
         set {
             db.settings.insert().or("REPLACE").value(db.settings.key, "sound").value(db.settings.value, value.to_string()).perform();
             sound_ = value;
+        }
+    }
+
+    private bool custom_sound_;
+    public bool custom_sound {
+        get { return custom_sound_; }
+        set {
+            db.settings.insert().or("REPLACE").value(db.settings.key, "custom_sound").value(db.settings.value, value.to_string()).perform();
+            custom_sound_ = value;
+        }
+    }
+
+    private string custom_sound_file_;
+    public string custom_sound_file {
+        get { return custom_sound_file_; }
+        set {
+            db.settings.insert().or("REPLACE").value(db.settings.key, "custom_sound_file").value(db.settings.value, value).perform();
+            custom_sound_file_ = value;
         }
     }
 

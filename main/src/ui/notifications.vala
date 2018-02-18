@@ -71,9 +71,15 @@ public class Notifications : Object {
             active_conversation_ids.add(conversation.id.to_string());
             window.urgency_hint = true;
         }
-        if (conversation.get_sound_setting(stream_interactor)) {
+        Conversation.SoundSetting sound_setting = conversation.get_sound_setting(stream_interactor);
+        if (sound_setting == Conversation.SoundSetting.ON) {
             sound_context.play (0,
                 Canberra.PROP_EVENT_ID, "message-new-instant",
+                Canberra.PROP_EVENT_DESCRIPTION, "New Dino message");
+        }
+        else if (sound_setting == Conversation.SoundSetting.CUSTOM) {
+            sound_context.play (0,
+                Canberra.PROP_MEDIA_FILENAME, conversation.get_sound_file(stream_interactor),
                 Canberra.PROP_EVENT_DESCRIPTION, "New Dino message");
         }
     }

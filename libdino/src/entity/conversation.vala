@@ -34,6 +34,9 @@ public class Conversation : Object {
     public enum NotifySetting { DEFAULT, ON, OFF, HIGHLIGHT }
     public NotifySetting notify_setting { get; set; default = NotifySetting.DEFAULT; }
 
+    public enum SoundSetting { DEFAULT, ON, OFF, CUSTOM }
+    // public SoundSetting sound_setting { get; set; default = SoundSetting.DEFAULT; }
+
     public enum Setting { DEFAULT, ON, OFF }
     public Setting send_typing { get; set; default = Setting.DEFAULT; }
 
@@ -101,8 +104,18 @@ public class Conversation : Object {
         return notify_setting != NotifySetting.DEFAULT ? notify_setting : get_notification_default_setting(stream_interactor);
     }
 
-    public bool get_sound_setting(StreamInteractor stream_interactor) {
-        return Application.get_default().settings.sound;
+    public SoundSetting get_sound_setting(StreamInteractor stream_interactor) {
+        if (Application.get_default().settings.sound) {
+            if (Application.get_default().settings.custom_sound) {
+                return SoundSetting.CUSTOM;
+            }
+            return SoundSetting.ON;
+        }
+        return SoundSetting.OFF;
+    }
+
+    public string get_sound_file(StreamInteractor stream_interactor) {
+        return Application.get_default().settings.custom_sound_file;
     }
 
     public NotifySetting get_notification_default_setting(StreamInteractor stream_interactor) {
