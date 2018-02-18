@@ -35,7 +35,9 @@ public class Conversation : Object {
     public NotifySetting notify_setting { get; set; default = NotifySetting.DEFAULT; }
 
     public enum SoundSetting { DEFAULT, ON, OFF, CUSTOM }
-    // public SoundSetting sound_setting { get; set; default = SoundSetting.DEFAULT; }
+    public SoundSetting sound_setting { get; set; default = SoundSetting.DEFAULT; }
+
+    public string sound_file { get; set; default = ""; }
 
     public enum Setting { DEFAULT, ON, OFF }
     public Setting send_typing { get; set; default = Setting.DEFAULT; }
@@ -67,6 +69,8 @@ public class Conversation : Object {
         int? read_up_to = row[db.conversation.read_up_to];
         if (read_up_to != null) this.read_up_to = db.get_message_by_id(read_up_to);
         notify_setting = (NotifySetting) row[db.conversation.notification];
+        sound_setting = (SoundSetting) row[db.conversation.sound];
+        sound_file = row[db.conversation.sound_file];
         send_typing = (Setting) row[db.conversation.send_typing];
         send_marker = (Setting) row[db.conversation.send_marker];
 
@@ -82,6 +86,8 @@ public class Conversation : Object {
                 .value(db.conversation.encryption, encryption)
                 .value(db.conversation.active, active)
                 .value(db.conversation.notification, notify_setting)
+                .value(db.conversation.sound, sound_setting)
+                .value(db.conversation.sound_file, sound_file)
                 .value(db.conversation.send_typing, send_typing)
                 .value(db.conversation.send_marker, send_marker);
         if (read_up_to != null) {
@@ -104,18 +110,16 @@ public class Conversation : Object {
         return notify_setting != NotifySetting.DEFAULT ? notify_setting : get_notification_default_setting(stream_interactor);
     }
 
-    public SoundSetting get_sound_setting(StreamInteractor stream_interactor) {
-        if (Application.get_default().settings.sound) {
-            if (Application.get_default().settings.custom_sound) {
-                return SoundSetting.CUSTOM;
-            }
-            return SoundSetting.ON;
-        }
-        return SoundSetting.OFF;
+    public SoundSetting get_sound_setting2(StreamInteractor stream_interactor) {
+        return sound_setting != SoundSetting.DEFAULT ? sound_setting : get_sound_default_setting(stream_interactor);
     }
 
-    public string get_sound_file(StreamInteractor stream_interactor) {
-        return Application.get_default().settings.custom_sound_file;
+    public string get_sound_file2(StreamInteractor stream_interactor) {
+        if (sound_setting == SoundSetting.DEFAULT) {
+            return Application.get_default().settings.custom_sound_file;
+        } else {
+            return sound_file;
+        }
     }
 
     public NotifySetting get_notification_default_setting(StreamInteractor stream_interactor) {
@@ -126,6 +130,16 @@ public class Conversation : Object {
             return members_only ? NotifySetting.ON : NotifySetting.HIGHLIGHT;
         }
         return NotifySetting.ON;
+    }
+
+    public SoundSetting get_sound_default_setting(StreamInteractor stream_interactor) {
+        if (Application.get_default().settings.sound) {
+            if (Application.get_default().settings.custom_sound) {
+                return SoundSetting.CUSTOM;
+            }
+            return SoundSetting.ON;
+        }
+        return SoundSetting.OFF;
     }
 
     public Setting get_send_typing_setting() {
@@ -178,6 +192,10 @@ public class Conversation : Object {
                 break;
             case "notify-setting":
                 update.set(db.conversation.notification, notify_setting); break;
+            case "sound-setting":
+                update.set(db.conversation.sound, sound_setting); break;
+            case "sound-file":
+                update.set(db.conversation.sound_file, sound_file); break;
             case "send-typing":
                 update.set(db.conversation.send_typing, send_typing); break;
             case "send-marker":

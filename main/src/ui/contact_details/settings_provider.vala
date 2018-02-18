@@ -30,6 +30,28 @@ public class SettingsProvider : Plugins.ContactDetailsProvider, Object {
             contact_details.add(_("Settings"), _("Notifications"), "", combobox_notifications);
             combobox_notifications.active_id = get_notify_setting_id(conversation.notify_setting);
             combobox_notifications.changed.connect(() => { conversation.notify_setting = get_notify_setting(combobox_notifications.active_id); } );
+
+
+            Box box_sound = new Box(Orientation.HORIZONTAL, 0) { visible=true };
+            ComboBoxText combobox_sound = new ComboBoxText() { visible=true };
+            FileChooserButton file_sound = new FileChooserButton("Choose custom sound", FileChooserAction.OPEN) { visible=(conversation.sound_setting == Conversation.SoundSetting.CUSTOM) };
+
+            combobox_sound.append("default", get_sound_setting_string(Conversation.SoundSetting.DEFAULT, conversation.get_sound_default_setting(stream_interactor)));
+            combobox_sound.append("on", get_sound_setting_string(Conversation.SoundSetting.ON));
+            combobox_sound.append("off", get_sound_setting_string(Conversation.SoundSetting.OFF));
+            combobox_sound.append("custom", get_sound_setting_string(Conversation.SoundSetting.CUSTOM));
+            combobox_sound.active_id = get_sound_setting_id(conversation.sound_setting);
+            combobox_sound.changed.connect(() => {
+                conversation.sound_setting = get_sound_setting(combobox_sound.active_id);
+                file_sound.visible = (conversation.sound_setting == Conversation.SoundSetting.CUSTOM);
+            } );
+
+            file_sound.set_filename(conversation.sound_file);
+            file_sound.file_set.connect(() => { conversation.sound_file = file_sound.get_filename(); } );
+
+            box_sound.pack_start(file_sound, false, false, 0);
+            box_sound.pack_start(combobox_sound, false, false, 5);
+            contact_details.add(_("Settings"), _("Sound"), "", box_sound);
         } else if (conversation.type_ == Conversation.Type.GROUPCHAT) {
             ComboBoxText combobox = new ComboBoxText() { visible=true };
             combobox.append("default", get_notify_setting_string(Conversation.NotifySetting.DEFAULT, conversation.get_notification_default_setting(stream_interactor)));
@@ -68,6 +90,20 @@ public class SettingsProvider : Plugins.ContactDetailsProvider, Object {
         assert_not_reached();
     }
 
+    private Conversation.SoundSetting get_sound_setting(string id) {
+        switch (id) {
+            case "default":
+                return Conversation.SoundSetting.DEFAULT;
+            case "on":
+                return Conversation.SoundSetting.ON;
+            case "off":
+                return Conversation.SoundSetting.OFF;
+            case "custom":
+                return Conversation.SoundSetting.CUSTOM;
+        }
+        assert_not_reached();
+    }
+
     private string get_notify_setting_string(Conversation.NotifySetting setting, Conversation.NotifySetting? default_setting = null) {
         switch (setting) {
             case Conversation.NotifySetting.ON:
@@ -78,6 +114,20 @@ public class SettingsProvider : Plugins.ContactDetailsProvider, Object {
                 return _("Only when mentioned");
             case Conversation.NotifySetting.DEFAULT:
                 return _("Default: %s").printf(get_notify_setting_string(default_setting));
+        }
+        assert_not_reached();
+    }
+
+    private string get_sound_setting_string(Conversation.SoundSetting setting, Conversation.SoundSetting? default_setting = null) {
+        switch (setting) {
+            case Conversation.SoundSetting.ON:
+                return _("System sound");
+            case Conversation.SoundSetting.OFF:
+                return _("No sound");
+            case Conversation.SoundSetting.CUSTOM:
+                return _("Custom sound");
+            case Conversation.SoundSetting.DEFAULT:
+                return _("Default: %s").printf(get_sound_setting_string(default_setting));
         }
         assert_not_reached();
     }
@@ -104,6 +154,20 @@ public class SettingsProvider : Plugins.ContactDetailsProvider, Object {
                 return "off";
             case Conversation.NotifySetting.HIGHLIGHT:
                 return "highlight";
+        }
+        assert_not_reached();
+    }
+
+    private string get_sound_setting_id(Conversation.SoundSetting setting) {
+        switch (setting) {
+            case Conversation.SoundSetting.DEFAULT:
+                return "default";
+            case Conversation.SoundSetting.ON:
+                return "on";
+            case Conversation.SoundSetting.OFF:
+                return "off";
+            case Conversation.SoundSetting.CUSTOM:
+                return "custom";
         }
         assert_not_reached();
     }
